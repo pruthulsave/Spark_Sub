@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype Access - SIH Project</title>
+    
+    <!-- Clean modern typography via Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base styles */
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-start: #4f46e5;
+            --accent-end: #3b82f6;
+            --warning: #f59e0b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background: radial-gradient(circle at top center, #1e1e2e 0%, var(--bg-color) 70%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle grid/noise effect */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Soft ambient glow */
+        .ambient-glow {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(0,0,0,0) 60%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism card */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 420px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Minimal Status Indicator */
+        .status-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            margin-bottom: 1.25rem;
+        }
+
+        .warning-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--warning);
+            box-shadow: 0 0 12px 2px rgba(245, 158, 11, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* Typography */
+        h1 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            margin: 0 0 2rem 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.85rem 1.75rem;
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.4);
+            gap: 8px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* Footer */
+        footer {
+            position: absolute;
+            bottom: 2rem;
+            z-index: 1;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .card {
+                padding: 2.5rem 1.5rem;
+            }
+            h1 {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Decorative background elements -->
+    <div class="grid-overlay"></div>
+    <div class="ambient-glow"></div>
+    
+    <!-- Main content card -->
+    <div class="card">
+        <div class="status-wrapper">
+            <div class="warning-dot"></div>
+        </div>
+        
+        <h1>Oops! An error has occurred</h1>
+        
+        <p>The prototype is currently being updated. Please use the link below to continue to the latest version.</p>
+        
+        <a href="#" id="continue-btn" class="cta-button">
+            Continue to Prototype <span class="arrow">&rarr;</span>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>[SIH Project Name] &bull; Prototype Access</p>
+    </footer>
+
+    <script>
+        /**
+         * ==============================================
+         * CONFIGURATION
+         * ==============================================
+         * Replace the PROTOTYPE_URL below with the final 
+         * location of your prototype once deployed.
+         */
+        const PROTOTYPE_URL = "https://example.com";
+        // ==============================================
+
+        // Set the href attribute dynamically on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("continue-btn");
+            if (btn) {
+                btn.href = PROTOTYPE_URL;
+            }
+        });
+    </script>
+
+</body>
+</html>
